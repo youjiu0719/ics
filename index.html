@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICS Elite - Taskbar Pro Fix</title>
+  <title>ICS Elite - Ultra Vision</title>
   <style>
     :root {
       --retro-brown: #3e2723;
@@ -24,55 +24,47 @@
       height: 100vh; width: 100vw; display: flex; overflow: hidden;
     }
 
-    /* 左側：日期、時鐘與排行 */
+    /* 左側：日期、大時鐘與排行 */
     .sidebar-left {
       width: 200px; height: 100vh; background: rgba(255, 255, 255, 0.4);
       border-right: 2px solid var(--retro-brown);
       display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; flex-shrink: 0;
     }
 
-    /* 補回英文日期樣式 */
-    .date-display {
-      font-size: 0.85em; font-weight: 900; text-align: center; margin-bottom: 5px;
-      color: var(--retro-brown); line-height: 1.2;
-    }
-
-    .digital-clock { 
-      text-align: center; font-family: 'Courier New', monospace; font-size: 1.5em; font-weight: 900; 
-      background: var(--retro-brown); color: #76ff03; padding: 6px 4px; border-radius: 6px; margin-bottom: 5px;
-    }
+    .date-display { font-size: 0.85em; font-weight: 900; text-align: center; margin-bottom: 5px; line-height: 1.2; }
+    .digital-clock { text-align: center; font-family: 'Courier New', monospace; font-size: 1.5em; font-weight: 900; background: var(--retro-brown); color: #76ff03; padding: 6px 4px; border-radius: 6px; margin-bottom: 5px; }
 
     .analog-clock { 
-      width: 60px; height: 60px; background: white; border: 2px solid var(--retro-brown); 
-      border-radius: 50%; margin: 5px auto; position: relative; flex-shrink: 0;
+      width: 170px; height: 170px; background: white; border: 3px solid var(--retro-brown); 
+      border-radius: 50%; margin: 5px auto 10px; position: relative; flex-shrink: 0;
     }
     .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: var(--retro-brown); border-radius: 10px; transform: translateX(-50%); }
-    .hour-hand { width: 3px; height: 25%; z-index: 3; }
-    .min-hand { width: 2px; height: 35%; z-index: 2; }
-    .sec-hand { width: 1px; height: 40%; background: red; z-index: 1; }
-    .center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 4px; height: 4px; background: var(--retro-brown); border-radius: 50%; z-index: 4; }
+    .hour-hand { width: 5px; height: 25%; z-index: 3; }
+    .min-hand { width: 3px; height: 38%; z-index: 2; }
+    .sec-hand { width: 1.5px; height: 45%; background: red; z-index: 1; }
+    .center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: var(--retro-brown); border-radius: 50%; z-index: 4; }
 
     .rank-section { flex-grow: 1; overflow-y: auto; border-top: 2px solid var(--retro-brown); margin-top: 5px; }
     .rank-item { display: flex; justify-content: space-between; padding: 4px 6px; margin: 3px 0; background: white; border-radius: 4px; font-size: 0.85em; font-weight: 900; }
 
-    /* 中間：核心區 */
+    /* 中間：超級大的計時器 */
     .main-wrapper {
       flex: 1; height: 100vh; display: flex; flex-direction: column; align-items: center; overflow: hidden;
     }
 
     .big-timer-container {
-        margin: 10px 0; position: relative; width: 130px; height: 130px; flex-shrink: 0;
+        margin: 20px 0; position: relative; width: 220px; height: 220px; flex-shrink: 0;
     }
-    .timer-svg { transform: rotate(-90deg); width: 130px; height: 130px; }
-    .timer-bg { fill: none; stroke: rgba(255,255,255,0.3); stroke-width: 10; }
+    .timer-svg { transform: rotate(-90deg); width: 220px; height: 220px; }
+    .timer-bg { fill: none; stroke: rgba(255,255,255,0.3); stroke-width: 12; }
     .timer-progress { 
-        fill: none; stroke: var(--plus-green); stroke-width: 10; 
-        stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 0;
+        fill: none; stroke: var(--plus-green); stroke-width: 12; 
+        stroke-linecap: round; stroke-dasharray: 628; stroke-dashoffset: 0;
         transition: stroke-dashoffset 1s linear;
     }
     .timer-text-center {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        font-family: 'Courier New', monospace; font-size: 2em; font-weight: 900;
+        font-family: 'Courier New', monospace; font-size: 3.2em; font-weight: 900; cursor: pointer;
     }
 
     .main-content {
@@ -81,13 +73,17 @@
       gap: 12px; align-content: start;
     }
 
-    /* 右側面板：強制按鈕沉底 */
+    /* 右側面板：對齊計時器下端 */
     .sidebar-right {
-      width: 170px; height: 100vh; padding: 10px; box-sizing: border-box; flex-shrink: 0;
-      display: flex; flex-direction: column; justify-content: space-between;
+      width: 180px; height: 100vh; padding: 10px; box-sizing: border-box; flex-shrink: 0;
+      display: flex; flex-direction: column;
       border-left: 1px dashed var(--retro-brown);
     }
 
+    /* 頂部空出與計時器相當的高度，讓按鈕往下靠 */
+    .spacer-top { height: 240px; flex-shrink: 0; } 
+
+    .control-group { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 40px; }
     .control-panel { background: rgba(255,255,255,0.3); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
     
     .card { 
@@ -101,7 +97,7 @@
 
     .btn-row { display: flex; gap: 3px; width: 100%; margin-top: 2px; }
     .btn-row button { 
-      flex: 1; padding: 4px 0; font-weight: 900; border-radius: 4px; 
+      flex: 1; padding: 6px 0; font-weight: 900; border-radius: 4px; 
       border: 1.5px solid var(--retro-brown); cursor: pointer; font-size: 0.8em; 
       transition: 0.1s; position: relative;
     }
@@ -109,7 +105,7 @@
     .btn-minus { background: #fff; color: var(--minus-red); box-shadow: 0 2px 0 var(--minus-border); }
     .btn-row button:active { top: 2px; box-shadow: 0 0 0; }
 
-    .btn-manage { background: #fff; border: 1.5px solid var(--retro-brown); padding: 5px; font-weight: 900; border-radius: 6px; cursor: pointer; font-size: 0.85em; box-shadow: 0 2px 0 var(--retro-brown); width: 100%; position: relative; }
+    .btn-manage { background: #fff; border: 1.5px solid var(--retro-brown); padding: 6px; font-weight: 900; border-radius: 6px; cursor: pointer; font-size: 0.85em; box-shadow: 0 2px 0 var(--retro-brown); width: 100%; position: relative; }
     .btn-manage:active { top: 2px; box-shadow: 0 0px 0; }
     .btn-manage.active { background: var(--plus-green); color: white; }
 
@@ -134,9 +130,9 @@
 
   <div class="main-wrapper">
     <div class="big-timer-container">
-        <svg class="timer-svg" viewBox="0 0 150 150">
-            <circle class="timer-bg" cx="75" cy="75" r="60"></circle>
-            <circle id="timer-bar" class="timer-progress" cx="75" cy="75" r="60" stroke-dasharray="377"></circle>
+        <svg class="timer-svg" viewBox="0 0 220 220">
+            <circle class="timer-bg" cx="110" cy="110" r="100"></circle>
+            <circle id="timer-bar" class="timer-progress" cx="110" cy="110" r="100" stroke-dasharray="628"></circle>
         </svg>
         <div id="timer-display" class="timer-text-center" onclick="customTimer()">00:00</div>
     </div>
@@ -144,15 +140,9 @@
   </div>
 
   <aside class="sidebar-right">
-    <div>
-        <div class="control-panel">
-          <button class="btn-manage" onclick="addNewStudent()">➕ 新增學生</button>
-          <button class="btn-manage" onclick="exportData()" style="font-size:0.75em">💾 備份資料代碼</button>
-          <button class="btn-manage" onclick="importData()" style="font-size:0.75em">📂 還原資料代碼</button>
-        </div>
-    </div>
+    <div class="spacer-top"></div>
 
-    <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 5px;">
+    <div class="control-group">
         <div class="control-panel">
           <div style="display:flex; gap:3px;">
             <button id="md-apple" class="btn-manage active" onclick="switchMode('apple')">🍎</button>
@@ -178,7 +168,15 @@
             </div>
         </div>
         
-        <button class="btn-manage" style="color:red; font-size:0.7em; padding:3px;" onclick="resetScores()">全班歸零</button>
+        <button class="btn-manage" style="color:red; font-size:0.75em; padding:4px;" onclick="resetScores()">全班積分歸零</button>
+
+        <div class="control-panel">
+          <button class="btn-manage" onclick="addNewStudent()">➕ 新增學生</button>
+          <div style="display:flex; gap:3px;">
+              <button class="btn-manage" onclick="exportData()" style="font-size:0.7em">💾 備份</button>
+              <button class="btn-manage" onclick="importData()" style="font-size:0.7em">📂 還原</button>
+          </div>
+        </div>
     </div>
   </aside>
 
@@ -214,16 +212,14 @@
         save();
       }
       setInterval(updateClocks, 1000);
-      updateClocks(); // 立即更新一次
+      updateClocks();
       render();
     }
 
-    // 格式化英文日期
     function getEnglishDate() {
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       const today = new Date();
       const parts = today.toLocaleDateString('en-US', options).split(', ');
-      // 格式：Wednesday <br> March 18, 2026
       return `${parts[0]}<br>${parts[1]}, ${parts[2]}`;
     }
 
@@ -299,7 +295,7 @@
     function updateTimerDisplay() { 
         document.getElementById('timer-display').innerText = `${String(Math.floor(timeLeft/60)).padStart(2,'0')}:${String(timeLeft%60).padStart(2,'0')}`;
         const bar = document.getElementById('timer-bar');
-        const offset = totalStartTime > 0 ? 377 * (1 - timeLeft / totalStartTime) : 0;
+        const offset = totalStartTime > 0 ? 628 * (1 - timeLeft / totalStartTime) : 0;
         bar.style.strokeDashoffset = offset;
     }
     function customTimer() { const m = prompt("分鐘？", "1"); if(m) { timeLeft = parseInt(m)*60; totalStartTime = timeLeft; updateTimerDisplay(); } }
