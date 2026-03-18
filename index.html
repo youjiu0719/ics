@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICS Elite - Ultra Vision</title>
+  <title>ICS Elite - Ultra Layout Fix</title>
   <style>
     :root {
       --retro-brown: #3e2723;
@@ -32,11 +32,11 @@
     }
 
     .date-display { font-size: 0.85em; font-weight: 900; text-align: center; margin-bottom: 5px; line-height: 1.2; }
-    .digital-clock { text-align: center; font-family: 'Courier New', monospace; font-size: 1.5em; font-weight: 900; background: var(--retro-brown); color: #76ff03; padding: 6px 4px; border-radius: 6px; margin-bottom: 5px; }
+    .digital-clock { text-align: center; font-family: 'Courier New', monospace; font-size: 1.4em; font-weight: 900; background: var(--retro-brown); color: #76ff03; padding: 6px 4px; border-radius: 6px; margin-bottom: 5px; }
 
     .analog-clock { 
       width: 170px; height: 170px; background: white; border: 3px solid var(--retro-brown); 
-      border-radius: 50%; margin: 5px auto 10px; position: relative; flex-shrink: 0;
+      border-radius: 50%; margin: 5px auto; position: relative; flex-shrink: 0;
     }
     .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: var(--retro-brown); border-radius: 10px; transform: translateX(-50%); }
     .hour-hand { width: 5px; height: 25%; z-index: 3; }
@@ -44,16 +44,16 @@
     .sec-hand { width: 1.5px; height: 45%; background: red; z-index: 1; }
     .center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: var(--retro-brown); border-radius: 50%; z-index: 4; }
 
-    .rank-section { flex-grow: 1; overflow-y: auto; border-top: 2px solid var(--retro-brown); margin-top: 5px; }
+    .rank-section { flex-grow: 1; overflow-y: auto; border-top: 2px solid var(--retro-brown); margin-top: 10px; }
     .rank-item { display: flex; justify-content: space-between; padding: 4px 6px; margin: 3px 0; background: white; border-radius: 4px; font-size: 0.85em; font-weight: 900; }
 
-    /* 中間：超級大的計時器 */
+    /* 中間：強制高度鎖定 */
     .main-wrapper {
-      flex: 1; height: 100vh; display: flex; flex-direction: column; align-items: center; overflow: hidden;
+      flex: 1; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
     }
 
     .big-timer-container {
-        margin: 20px 0; position: relative; width: 220px; height: 220px; flex-shrink: 0;
+        margin: 15px auto; position: relative; width: 220px; height: 220px; flex-shrink: 0;
     }
     .timer-svg { transform: rotate(-90deg); width: 220px; height: 220px; }
     .timer-bg { fill: none; stroke: rgba(255,255,255,0.3); stroke-width: 12; }
@@ -67,23 +67,29 @@
         font-family: 'Courier New', monospace; font-size: 3.2em; font-weight: 900; cursor: pointer;
     }
 
+    /* 學生捲軸區：關鍵修正 */
     .main-content {
-      width: 100%; overflow-y: auto; padding: 10px 15px; box-sizing: border-box;
+      flex: 1; /* 自動填滿剩下的空間 */
+      overflow-y: auto; padding: 10px 15px 40px; box-sizing: border-box;
       display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 12px; align-content: start;
     }
 
-    /* 右側面板：對齊計時器下端 */
+    /* 右側面板 */
     .sidebar-right {
       width: 180px; height: 100vh; padding: 10px; box-sizing: border-box; flex-shrink: 0;
       display: flex; flex-direction: column;
       border-left: 1px dashed var(--retro-brown);
+      overflow: hidden;
     }
 
-    /* 頂部空出與計時器相當的高度，讓按鈕往下靠 */
-    .spacer-top { height: 240px; flex-shrink: 0; } 
+    .spacer-top { height: 250px; flex-shrink: 0; } /* 對齊計時器底端 */
 
-    .control-group { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-bottom: 40px; }
+    .control-group { 
+        display: flex; flex-direction: column; gap: 8px; 
+        overflow-y: auto; /* 按鈕過多時可內部捲動 */
+        padding-bottom: 50px; 
+    }
     .control-panel { background: rgba(255,255,255,0.3); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
     
     .card { 
@@ -141,7 +147,6 @@
 
   <aside class="sidebar-right">
     <div class="spacer-top"></div>
-
     <div class="control-group">
         <div class="control-panel">
           <div style="display:flex; gap:3px;">
