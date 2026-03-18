@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICS Elite - Ultra Layout Fix</title>
+  <title>ICS Elite - Audio Fixed</title>
   <style>
     :root {
       --retro-brown: #3e2723;
@@ -24,7 +24,6 @@
       height: 100vh; width: 100vw; display: flex; overflow: hidden;
     }
 
-    /* 左側：日期、大時鐘與排行 */
     .sidebar-left {
       width: 200px; height: 100vh; background: rgba(255, 255, 255, 0.4);
       border-right: 2px solid var(--retro-brown);
@@ -47,7 +46,6 @@
     .rank-section { flex-grow: 1; overflow-y: auto; border-top: 2px solid var(--retro-brown); margin-top: 10px; }
     .rank-item { display: flex; justify-content: space-between; padding: 4px 6px; margin: 3px 0; background: white; border-radius: 4px; font-size: 0.85em; font-weight: 900; }
 
-    /* 中間：強制高度鎖定 */
     .main-wrapper {
       flex: 1; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
     }
@@ -67,15 +65,13 @@
         font-family: 'Courier New', monospace; font-size: 3.2em; font-weight: 900; cursor: pointer;
     }
 
-    /* 學生捲軸區：關鍵修正 */
     .main-content {
-      flex: 1; /* 自動填滿剩下的空間 */
+      flex: 1; 
       overflow-y: auto; padding: 10px 15px 40px; box-sizing: border-box;
       display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 12px; align-content: start;
     }
 
-    /* 右側面板 */
     .sidebar-right {
       width: 180px; height: 100vh; padding: 10px; box-sizing: border-box; flex-shrink: 0;
       display: flex; flex-direction: column;
@@ -83,11 +79,11 @@
       overflow: hidden;
     }
 
-    .spacer-top { height: 250px; flex-shrink: 0; } /* 對齊計時器底端 */
+    .spacer-top { height: 250px; flex-shrink: 0; } 
 
     .control-group { 
         display: flex; flex-direction: column; gap: 8px; 
-        overflow-y: auto; /* 按鈕過多時可內部捲動 */
+        overflow-y: auto; 
         padding-bottom: 50px; 
     }
     .control-panel { background: rgba(255,255,255,0.3); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
@@ -194,8 +190,19 @@
     let studentsData = JSON.parse(localStorage.getItem(KEY));
     let currentClass = 'ICS', currentMode = 'apple', timeLeft = 0, totalStartTime = 0, timerId = null;
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // 音效環境優化
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
     function playTone(freq, type, duration, vol=0.1) {
+        initAudio();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
@@ -206,7 +213,10 @@
     }
     const soundPlus = () => playTone(880, 'sine', 0.2);
     const soundMinus = () => playTone(440, 'triangle', 0.2);
-    const soundAlarm = () => { playTone(660, 'square', 0.3); setTimeout(() => playTone(660, 'square', 0.3), 400); };
+    const soundAlarm = () => { 
+        playTone(660, 'square', 0.4); 
+        setTimeout(() => playTone(660, 'square', 0.4), 500); 
+    };
 
     function init() {
       if (!studentsData) {
@@ -284,26 +294,38 @@
     }
 
     function toggleTimer() { 
+        initAudio(); // 啟動音效環境
         const btn = document.getElementById('timer-start'); 
-        if (timerId) { clearInterval(timerId); timerId = null; btn.innerText = "GO"; } 
-        else if (timeLeft > 0) { 
+        if (timerId) { 
+            clearInterval(timerId); 
+            timerId = null; 
+            btn.innerText = "GO"; 
+        } else if (timeLeft > 0) { 
             if(totalStartTime === 0) totalStartTime = timeLeft;
             btn.innerText = "||"; 
             timerId = setInterval(() => { 
-                timeLeft--; updateTimerDisplay(); 
-                if (timeLeft <= 0) { clearInterval(timerId); timerId = null; btn.innerText = "GO"; soundAlarm(); alert("時間到！"); } 
+                timeLeft--; 
+                updateTimerDisplay(); 
+                if (timeLeft <= 0) { 
+                    clearInterval(timerId); 
+                    timerId = null; 
+                    btn.innerText = "GO"; 
+                    soundAlarm(); 
+                    setTimeout(() => alert("時間到！"), 100);
+                } 
             }, 1000); 
         } 
     }
-    function resetTimer() { clearInterval(timerId); timerId = null; timeLeft = 0; totalStartTime = 0; updateTimerDisplay(); }
-    function addTime(s) { timeLeft += s; totalStartTime = Math.max(totalStartTime, timeLeft); updateTimerDisplay(); }
+
+    function resetTimer() { clearInterval(timerId); timerId = null; timeLeft = 0; totalStartTime = 0; updateTimerDisplay(); document.getElementById('timer-start').innerText = "GO"; }
+    function addTime(s) { initAudio(); timeLeft += s; totalStartTime = Math.max(totalStartTime, timeLeft); updateTimerDisplay(); }
     function updateTimerDisplay() { 
         document.getElementById('timer-display').innerText = `${String(Math.floor(timeLeft/60)).padStart(2,'0')}:${String(timeLeft%60).padStart(2,'0')}`;
         const bar = document.getElementById('timer-bar');
         const offset = totalStartTime > 0 ? 628 * (1 - timeLeft / totalStartTime) : 0;
         bar.style.strokeDashoffset = offset;
     }
-    function customTimer() { const m = prompt("分鐘？", "1"); if(m) { timeLeft = parseInt(m)*60; totalStartTime = timeLeft; updateTimerDisplay(); } }
+    function customTimer() { initAudio(); const m = prompt("分鐘？", "1"); if(m) { timeLeft = parseInt(m)*60; totalStartTime = timeLeft; updateTimerDisplay(); } }
 
     function save() { localStorage.setItem(KEY, JSON.stringify(studentsData)); }
     function switchClass(cls) { currentClass = cls; document.querySelectorAll('[id^="cls-"]').forEach(b => b.classList.toggle('active', b.id === 'cls-'+cls)); render(); }
