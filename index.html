@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICS Elite - Big Screen Optimized</title>
+  <title>ICS Elite - Taskbar Pro Fix</title>
   <style>
     :root {
       --retro-brown: #3e2723;
@@ -24,62 +24,68 @@
       height: 100vh; width: 100vw; display: flex; overflow: hidden;
     }
 
-    /* 左側：排行 (高度自適應) */
+    /* 左側：日期、時鐘與排行 */
     .sidebar-left {
-      width: 200px; background: rgba(255, 255, 255, 0.4);
-      border-right: 2px solid var(--retro-brown); height: 100%;
+      width: 200px; height: 100vh; background: rgba(255, 255, 255, 0.4);
+      border-right: 2px solid var(--retro-brown);
       display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; flex-shrink: 0;
     }
 
+    /* 補回英文日期樣式 */
+    .date-display {
+      font-size: 0.85em; font-weight: 900; text-align: center; margin-bottom: 5px;
+      color: var(--retro-brown); line-height: 1.2;
+    }
+
     .digital-clock { 
-      text-align: center; font-family: 'Courier New', monospace; font-size: 1.6em; font-weight: 900; 
-      background: var(--retro-brown); color: #76ff03; padding: 8px 4px; border-radius: 6px; 
-      box-shadow: inset 0 0 10px #000; margin-bottom: 5px;
+      text-align: center; font-family: 'Courier New', monospace; font-size: 1.5em; font-weight: 900; 
+      background: var(--retro-brown); color: #76ff03; padding: 6px 4px; border-radius: 6px; margin-bottom: 5px;
     }
 
     .analog-clock { 
-      width: 70px; height: 70px; background: white; border: 2px solid var(--retro-brown); 
+      width: 60px; height: 60px; background: white; border: 2px solid var(--retro-brown); 
       border-radius: 50%; margin: 5px auto; position: relative; flex-shrink: 0;
     }
     .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: var(--retro-brown); border-radius: 10px; transform: translateX(-50%); }
     .hour-hand { width: 3px; height: 25%; z-index: 3; }
     .min-hand { width: 2px; height: 35%; z-index: 2; }
-    .sec-hand { width: 1.5px; height: 40%; background: red; z-index: 1; }
+    .sec-hand { width: 1px; height: 40%; background: red; z-index: 1; }
     .center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 4px; height: 4px; background: var(--retro-brown); border-radius: 50%; z-index: 4; }
 
-    .rank-section { flex-grow: 1; overflow-y: auto; border-top: 2px solid var(--retro-brown); padding-top: 5px; margin-top: 5px; }
-    .rank-item { display: flex; justify-content: space-between; padding: 4px 6px; margin: 3px 0; background: white; border-radius: 4px; font-size: 0.85em; font-weight: 900; border: 1px solid #bbb; }
+    .rank-section { flex-grow: 1; overflow-y: auto; border-top: 2px solid var(--retro-brown); margin-top: 5px; }
+    .rank-item { display: flex; justify-content: space-between; padding: 4px 6px; margin: 3px 0; background: white; border-radius: 4px; font-size: 0.85em; font-weight: 900; }
 
-    /* 中間區域：防止下方被吃掉的核心優化 */
+    /* 中間：核心區 */
     .main-wrapper {
-      flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; overflow: hidden;
+      flex: 1; height: 100vh; display: flex; flex-direction: column; align-items: center; overflow: hidden;
     }
 
     .big-timer-container {
-        margin: 10px 0; position: relative; width: 150px; height: 150px; flex-shrink: 0;
+        margin: 10px 0; position: relative; width: 130px; height: 130px; flex-shrink: 0;
     }
-    .timer-svg { transform: rotate(-90deg); width: 150px; height: 150px; }
+    .timer-svg { transform: rotate(-90deg); width: 130px; height: 130px; }
     .timer-bg { fill: none; stroke: rgba(255,255,255,0.3); stroke-width: 10; }
     .timer-progress { 
         fill: none; stroke: var(--plus-green); stroke-width: 10; 
-        stroke-linecap: round; stroke-dasharray: 440; stroke-dashoffset: 0;
+        stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 0;
         transition: stroke-dashoffset 1s linear;
     }
     .timer-text-center {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        font-family: 'Courier New', monospace; font-size: 2.2em; font-weight: 900;
+        font-family: 'Courier New', monospace; font-size: 2em; font-weight: 900;
     }
 
     .main-content {
-      flex: 1; width: 100%; overflow-y: auto; padding: 10px 20px; box-sizing: border-box;
+      width: 100%; overflow-y: auto; padding: 10px 15px; box-sizing: border-box;
       display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 12px; align-content: start;
     }
 
-    /* 右側：功能面板 */
+    /* 右側面板：強制按鈕沉底 */
     .sidebar-right {
-      width: 170px; height: 100%; padding: 10px; box-sizing: border-box; flex-shrink: 0;
-      display: flex; flex-direction: column; gap: 8px; border-left: 1px dashed var(--retro-brown);
+      width: 170px; height: 100vh; padding: 10px; box-sizing: border-box; flex-shrink: 0;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border-left: 1px dashed var(--retro-brown);
     }
 
     .control-panel { background: rgba(255,255,255,0.3); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
@@ -90,8 +96,8 @@
       box-shadow: 3px 3px 0 var(--retro-shadow);
     }
     .name { font-size: 1.1em; font-weight: 900; margin-bottom: 2px; cursor: pointer; }
-    .score-area { display: flex; align-items: center; gap: 3px; margin-bottom: 4px; }
-    .score-val { font-size: 1.6em; font-weight: 900; }
+    .score-area { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; font-weight: 900; }
+    .score-val { font-size: 1.6em; }
 
     .btn-row { display: flex; gap: 3px; width: 100%; margin-top: 2px; }
     .btn-row button { 
@@ -103,7 +109,7 @@
     .btn-minus { background: #fff; color: var(--minus-red); box-shadow: 0 2px 0 var(--minus-border); }
     .btn-row button:active { top: 2px; box-shadow: 0 0 0; }
 
-    .btn-manage { background: #fff; border: 1.5px solid var(--retro-brown); padding: 6px; font-weight: 900; border-radius: 6px; cursor: pointer; font-size: 0.85em; box-shadow: 0 2px 0 var(--retro-brown); width: 100%; position: relative; }
+    .btn-manage { background: #fff; border: 1.5px solid var(--retro-brown); padding: 5px; font-weight: 900; border-radius: 6px; cursor: pointer; font-size: 0.85em; box-shadow: 0 2px 0 var(--retro-brown); width: 100%; position: relative; }
     .btn-manage:active { top: 2px; box-shadow: 0 0px 0; }
     .btn-manage.active { background: var(--plus-green); color: white; }
 
@@ -111,10 +117,10 @@
     ::-webkit-scrollbar-thumb { background: var(--retro-brown); border-radius: 10px; }
   </style>
 </head>
-<body class="mode-apple">
+<body>
 
   <aside class="sidebar-left">
-    <div id="display-date" style="font-size:0.8em; text-align:center; font-weight:bold;">2026/03/18</div>
+    <div id="display-date" class="date-display">Wednesday<br>March 18, 2026</div>
     <div id="display-time" class="digital-clock">00:00:00</div>
     <div class="analog-clock">
       <div id="hour" class="hand hour-hand"></div>
@@ -123,14 +129,14 @@
       <div class="center-dot"></div>
     </div>
     <section class="rank-section" id="rank-list"></section>
-    <div id="total-amount" style="padding: 8px; background: var(--retro-brown); color: white; border-radius: 6px; text-align: center; font-weight: 900; font-size: 1em;">🍎 0</div>
+    <div id="total-amount" style="padding: 8px; background: var(--retro-brown); color: white; border-radius: 6px; text-align: center; font-weight: 900;">🍎 0</div>
   </aside>
 
   <div class="main-wrapper">
     <div class="big-timer-container">
         <svg class="timer-svg" viewBox="0 0 150 150">
-            <circle class="timer-bg" cx="75" cy="75" r="70"></circle>
-            <circle id="timer-bar" class="timer-progress" cx="75" cy="75" r="70" stroke-dasharray="440"></circle>
+            <circle class="timer-bg" cx="75" cy="75" r="60"></circle>
+            <circle id="timer-bar" class="timer-progress" cx="75" cy="75" r="60" stroke-dasharray="377"></circle>
         </svg>
         <div id="timer-display" class="timer-text-center" onclick="customTimer()">00:00</div>
     </div>
@@ -138,17 +144,22 @@
   </div>
 
   <aside class="sidebar-right">
-    <div class="control-panel">
-      <div style="display:flex; gap:3px;">
-        <button id="md-apple" class="btn-manage active" onclick="switchMode('apple')">🍎</button>
-        <button id="md-money" class="btn-manage" onclick="switchMode('money')">💰</button>
-      </div>
-      <button class="btn-manage" onclick="addNewStudent()">➕ 新增學生</button>
-      <button class="btn-manage" onclick="exportData()" style="font-size:0.75em">💾 備份</button>
-      <button class="btn-manage" onclick="importData()" style="font-size:0.75em">📂 還原</button>
+    <div>
+        <div class="control-panel">
+          <button class="btn-manage" onclick="addNewStudent()">➕ 新增學生</button>
+          <button class="btn-manage" onclick="exportData()" style="font-size:0.75em">💾 備份資料代碼</button>
+          <button class="btn-manage" onclick="importData()" style="font-size:0.75em">📂 還原資料代碼</button>
+        </div>
     </div>
 
-    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
+    <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 5px;">
+        <div class="control-panel">
+          <div style="display:flex; gap:3px;">
+            <button id="md-apple" class="btn-manage active" onclick="switchMode('apple')">🍎</button>
+            <button id="md-money" class="btn-manage" onclick="switchMode('money')">💰</button>
+          </div>
+        </div>
+
         <div class="control-panel">
             <div style="display:flex; gap:3px;">
                 <button id="cls-Chinese" class="btn-manage" onclick="switchClass('Chinese')">中文</button>
@@ -166,12 +177,12 @@
                 <button class="btn-manage" onclick="addTime(60)" style="font-size:0.75em">+1m</button>
             </div>
         </div>
-        <button class="btn-manage" style="color:red; font-size:0.7em; padding:4px;" onclick="resetScores()">全班歸零</button>
+        
+        <button class="btn-manage" style="color:red; font-size:0.7em; padding:3px;" onclick="resetScores()">全班歸零</button>
     </div>
   </aside>
 
   <script>
-    // 資料與邏輯部分保持不變，僅確保 UI 適應性
     const initialNames = {
       'Chinese': ['Allen', 'Mini', 'Lawrence', 'Sharon', 'Yenyen', 'Coco', 'Ivy', 'Kimi'],
       'ICS': ['YenYen', 'Lawrence', 'Coco', 'Ivy', 'Jasper', 'Angela', 'Eddie', 'Kimi', 'Polly', 'Anna', 'Amy', 'Ryan', 'Ada', 'Emma']
@@ -203,8 +214,17 @@
         save();
       }
       setInterval(updateClocks, 1000);
-      updateClocks();
+      updateClocks(); // 立即更新一次
       render();
+    }
+
+    // 格式化英文日期
+    function getEnglishDate() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const today = new Date();
+      const parts = today.toLocaleDateString('en-US', options).split(', ');
+      // 格式：Wednesday <br> March 18, 2026
+      return `${parts[0]}<br>${parts[1]}, ${parts[2]}`;
     }
 
     function updateClocks() {
@@ -214,6 +234,7 @@
       document.getElementById('min').style.transform = `translateX(-50%) rotate(${m*6}deg)`;
       document.getElementById('hour').style.transform = `translateX(-50%) rotate(${(h%12)*30 + m*0.5}deg)`;
       document.getElementById('display-time').innerText = now.toTimeString().split(' ')[0];
+      document.getElementById('display-date').innerHTML = getEnglishDate();
     }
 
     function updateScore(idx, amt) {
@@ -228,11 +249,13 @@
       grid.innerHTML = '';
       studentsData[currentClass].forEach((s, i) => {
         const val = currentMode === 'apple' ? s.apples : s.money;
+        const icon = currentMode === 'apple' ? '🍎' : '💰';
         const color = currentMode === 'apple' ? 'var(--apple-red)' : 'var(--money-gold)';
         grid.innerHTML += `
           <div class="card">
             <div class="name" onclick="editName(${i})">${s.name}</div>
             <div class="score-area">
+              <span>${icon}</span>
               <span class="score-val" style="color:${color}">${val}</span>
             </div>
             <div class="btn-row">
@@ -276,7 +299,7 @@
     function updateTimerDisplay() { 
         document.getElementById('timer-display').innerText = `${String(Math.floor(timeLeft/60)).padStart(2,'0')}:${String(timeLeft%60).padStart(2,'0')}`;
         const bar = document.getElementById('timer-bar');
-        const offset = totalStartTime > 0 ? 440 * (1 - timeLeft / totalStartTime) : 0;
+        const offset = totalStartTime > 0 ? 377 * (1 - timeLeft / totalStartTime) : 0;
         bar.style.strokeDashoffset = offset;
     }
     function customTimer() { const m = prompt("分鐘？", "1"); if(m) { timeLeft = parseInt(m)*60; totalStartTime = timeLeft; updateTimerDisplay(); } }
@@ -288,7 +311,7 @@
     function addNewStudent() { const n = prompt("名字："); if(n){ studentsData[currentClass].push({name:n, apples:0, money:0}); save(); render(); } }
     function resetScores() { if(confirm("確定全班歸零？")){ studentsData[currentClass].forEach(s=>s.apples=s.money=0); save(); render(); } }
     function exportData() { navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(studentsData)))).then(()=>alert("代碼已複製")); }
-    function importData() { const code = prompt("貼入代碼："); if(code) { try { studentsData = JSON.parse(decodeURIComponent(atob(code))); save(); render(); } catch(e){ alert("錯誤"); } } }
+    function importData() { const code = prompt("貼入代碼："); if(code) { try { studentsData = JSON.parse(decodeURIComponent(atob(code))); save(); render(); } catch(e){ alert("格式錯誤"); } } }
 
     init();
   </script>
